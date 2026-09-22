@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyPass · Ticket Booking</title>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #0b1a2e 0%, #1b2f4b 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .booking-container {
+      max-width: 1200px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 2.5rem;
+      padding: 2rem;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    }
+
+    .booking-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding: 0 0.5rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo i {
+      font-size: 2.2rem;
+      color: #6ee7ff;
+      filter: drop-shadow(0 0 8px rgba(110, 231, 255, 0.6));
+    }
+
+    .logo span {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 0%, #b0e0ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.5rem 1rem 0.5rem 0.8rem;
+      border-radius: 100px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .user-badge i {
+      font-size: 1.4rem;
+      color: #9bb8d4;
+    }
+
+    .user-badge span {
+      color: #e0f0ff;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    /* Main layout */
+    .booking-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .booking-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ---------- LEFT SIDE – SEARCH & TICKETS ---------- */
+    .search-card {
+      background: rgba(12, 25, 45, 0.7);
+      border-radius: 2rem;
+      padding: 1.8rem;
+      border: 1px solid rgba(110, 231, 255, 0.2);
+      box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .search-card:hover {
+      box-shadow: 0 20px 40px -12px rgba(0, 180, 255, 0.3);
+    }
+
+    .search-title {
+      color: #b4d9ff;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .search-title i {
+      color: #6ee7ff;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .field label {
+      color: #9ab8da;
+      font-size: 0.8rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .field label i {
+      color: #6ee7ff;
+      width: 1.1rem;
+      font-size: 0.9rem;
+    }
+
+    .field input,
+    .field select {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1.2rem;
+      padding: 1rem 1.2rem;
+      font-size: 1rem;
+      color: white;
+      outline: none;
+      transition: all 0.25s ease;
+      font-weight: 500;
+    }
+
+    .field input::placeholder {
+      color: #687e9c;
+      font-weight: 400;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: #6ee7ff;
+      background: rgba(110, 231, 255, 0.08);
+      box-shadow: 0 0 0 3px rgba(110, 231, 255, 0.15);
+    }
+
+    .field select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236ee7ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1.2rem center;
+      cursor: pointer;
+    }
+
+    .field select option {
+      background: #0e1e30;
+      color: white;
+    }
+
+    .date-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .search-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      border: none;
+      border-radius: 1.5rem;
+      padding: 1rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 8px 20px rgba(0, 114, 255, 0.3);
+      letter-spacing: 0.3px;
+      margin-bottom: 1.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .search-btn i {
+      font-size: 1.1rem;
+    }
+
+    .search-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(0, 180, 255, 0.5);
+      background: linear-gradient(135deg, #1ad0ff, #0080ff);
+    }
+
+    .search-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Ticket list */
+    .tickets-section h3 {
+      color: #b4d9ff;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tickets-section h3 i {
+      color: #6ee7ff;
+    }
+
+    .ticket-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .ticket-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1.5rem;
+      padding: 1.2rem 1.4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      animation: fadeSlideIn 0.5s ease backwards;
+    }
+
+    .ticket-item:nth-child(1) { animation-delay: 0.05s; }
+    .ticket-item:nth-child(2) { animation-delay: 0.1s; }
+    .ticket-item:nth-child(3) { animation-delay: 0.15s; }
+
+    @keyframes fadeSlideIn {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .ticket-item:hover {
+      background: rgba(110, 231, 255, 0.08);
+      border-color: rgba(110, 231, 255, 0.4);
+      transform: scale(1.01);
+    }
+
+    .ticket-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .ticket-route {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 700;
+      color: white;
+      font-size: 1.1rem;
+    }
+
+    .ticket-route i {
+      color: #6ee7ff;
+      font-size: 0.9rem;
+    }
+
+    .ticket-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.8rem;
+      color: #94aec9;
+      margin-top: 0.2rem;
+    }
+
+    .ticket-meta i {
+      margin-right: 0.3rem;
+      color: #6ee7ff;
+      font-size: 0.75rem;
+    }
+
+    .ticket-price {
+      font-weight: 800;
+      color: #6ee7ff;
+      font-size: 1.3rem;
+      letter-spacing: -0.5px;
+      text-shadow: 0 0 10px rgba(110, 231, 255, 0.4);
+      white-space: nowrap;
+    }
+
+    /* ---------- RIGHT SIDE – SUMMARY / CART ---------- */
+    .summary-card {
+      background: rgba(18, 30, 48, 0.8);
+      border-radius: 2rem;
+      padding: 1.8rem;
+      border: 1px solid rgba(110, 231, 255, 0.25);
+      box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      height: fit-content;
+      position: sticky;
+      top: 1.5rem;
+    }
+
+    .summary-card h2 {
+      color: white;
+      font-size: 1.3rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .summary-card h2 i {
+      color: #6ee7ff;
+      font-size: 1.4rem;
+    }
+
+    .selected-ticket {
+      background: rgba(0, 198, 255, 0.12);
+      border: 1px dashed rgba(110, 231, 255, 0.5);
+      border-radius: 1.5rem;
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .selected-ticket .placeholder {
+      color: #7a94b0;
+      text-align: center;
+      font-size: 0.95rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+    }
+
+    .selected-ticket .placeholder i {
+      font-size: 1.8rem;
+      color: #4e6d8c;
+    }
+
+    .selected-ticket .filled {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      animation: fadeSlideIn 0.3s ease;
+    }
+
+    .selected-route {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .selected-route i {
+      color: #6ee7ff;
+    }
+
+    .selected-details {
+      display: flex;
+      justify-content: space-between;
+      color: #b0cbe6;
+      font-size: 0.9rem;
+    }
+
+    .selected-price {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #6ee7ff;
+      text-align: right;
+      letter-spacing: -0.5px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      color: #b0cbe6;
+      font-size: 0.95rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .summary-row.total {
+      border-bottom: none;
+      margin-top: 0.5rem;
+      padding-top: 1rem;
+      font-weight: 700;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    .summary-row.total span:last-child {
+      color: #6ee7ff;
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .confirm-btn {
+      background: linear-gradient(135deg, #00e0b0, #00b4d8);
+      border: none;
+      border-radius: 1.5rem;
+      padding: 1.1rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0b1a2e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      margin-top: 1.5rem;
+      box-shadow: 0 10px 25px rgba(0, 200, 180, 0.3);
+      letter-spacing: 0.3px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .confirm-btn i {
+      font-size: 1.2rem;
+    }
+
+    .confirm-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 30px rgba(0, 220, 200, 0.5);
+      background: linear-gradient(135deg, #1af0c0, #00c8e0);
+    }
+
+    .confirm-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(0.5);
+    }
+
+    .confirm-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .toast-message {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #00c9a7;
+      color: #0b1a2e;
+      padding: 1rem 2rem;
+      border-radius: 100px;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(0, 201, 167, 0.5);
+      transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+      z-index: 1000;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    .toast-message.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast-message i {
+      font-size: 1.2rem;
+    }
+
+    /* small extras */
+    .glow-text {
+      text-shadow: 0 0 12px rgba(110, 231, 255, 0.5);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #2d4b6b;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4a6f93;
+    }
+  </style>
+</head>
+<body>
+  <div class="booking-container">
+    <!-- Header -->
+    <div class="booking-header">
+      <div class="logo">
+        <i class="fas fa-train"></i>
+        <span>SkyPass</span>
+      </div>
+      <div class="user-badge">
+        <i class="fas fa-user-astronaut"></i>
+        <span>Alex Rivera</span>
+      </div>
+    </div>
+
+    <!-- Main grid -->
+    <div class="booking-grid">
+      <!-- LEFT: Search + tickets -->
+      <div class="search-card">
+        <div class="search-title">
+          <i class="fas fa-sliders-h"></i> Find your journey
+        </div>
+
+        <!-- Inputs -->
+        <div class="input-group">
+          <div class="field">
+            <label><i class="fas fa-map-pin"></i> From</label>
+            <input type="text" id="fromInput" placeholder="e.g. New York" value="New York">
+          </div>
+          <div class="field">
+            <label><i class="fas fa-map-marker-alt"></i> To</label>
+            <input type="text" id="toInput" placeholder="e.g. Chicago" value="Chicago">
+          </div>
+          <div class="date-row">
+            <div class="field">
+              <label><i class="fas fa-calendar-alt"></i> Depart</label>
+              <input type="date" id="dateInput" value="2025-06-15">
+            </div>
+            <div class="field">
+              <label><i class="fas fa-clock"></i> Time</label>
+              <select id="timeSelect">
+                <option>Morning (6–12)</option>
+                <option selected>Afternoon (12–18)</option>
+                <option>Evening (18–24)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button class="search-btn" id="searchBtn">
+          <i class="fas fa-search"></i> Search tickets
+        </button>
+
+        <!-- Ticket list -->
+        <div class="tickets-section">
+          <h3><i class="fas fa-ticket-alt"></i> Available tickets</h3>
+          <div class="ticket-list" id="ticketList">
+            <!-- Dynamically filled with JS, but static fallback for initial -->
+            <div class="ticket-item" data-route="New York → Chicago" data-price="89" data-time="14:30" data-duration="3h 20m">
+              <div class="ticket-info">
+                <div class="ticket-route">
+                  <i class="fas fa-arrow-right"></i> New York → Chicago
+                </div>
+                <div class="ticket-meta">
+                  <span><i class="far fa-clock"></i> 14:30</span>
+                  <span><i class="fas fa-hourglass-half"></i> 3h 20m</span>
+                </div>
+              </div>
+              <div class="ticket-price">$89</div>
+            </div>
+            <div class="ticket-item" data-route="New York → Chicago" data-price="72" data-time="09:15" data-duration="3h 45m">
+              <div class="ticket-info">
+                <div class="ticket-route">
+                  <i class="fas fa-arrow-right"></i> New York → Chicago
+                </div>
+                <div class="ticket-meta">
+                  <span><i class="far fa-clock"></i> 09:15</span>
+                  <span><i class="fas fa-hourglass-half"></i> 3h 45m</span>
+                </div>
+              </div>
+              <div class="ticket-price">$72</div>
+            </div>
+            <div class="ticket-item" data-route="New York → Chicago" data-price="105" data-time="19:40" data-duration="3h 10m">
+              <div class="ticket-info">
+                <div class="ticket-route">
+                  <i class="fas fa-arrow-right"></i> New York → Chicago
+                </div>
+                <div class="ticket-meta">
+                  <span><i class="far fa-clock"></i> 19:40</span>
+                  <span><i class="fas fa-hourglass-half"></i> 3h 10m</span>
+                </div>
+              </div>
+              <div class="ticket-price">$105</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Booking summary -->
+      <div class="summary-card">
+        <h2><i class="fas fa-receipt"></i> Booking summary</h2>
+        
+        <div class="selected-ticket" id="selectedTicketContainer">
+          <!-- filled by JS, but placeholder initially -->
+          <div class="placeholder" id="placeholderMsg">
+            <i class="fas fa-hand-pointer"></i>
+            <span>Select a ticket from the list</span>
+          </div>
+          <div class="filled" id="filledTicket" style="display: none;">
+            <!-- dynamic content -->
+          </div>
+        </div>
+
+        <div class="summary-row">
+          <span>Base fare</span>
+          <span id="baseFare">$0</span>
+        </div>
+        <div class="summary-row">
+          <span>Taxes & fees</span>
+          <span id="taxes">$0</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span id="totalPrice">$0</span>
+        </div>
+
+        <button class="confirm-btn" id="confirmBtn" disabled>
+          <i class="fas fa-check-circle"></i> Confirm booking
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast message -->
+  <div class="toast-message" id="toast">
+    <i class="fas fa-check-circle"></i> <span id="toastText">Booking confirmed!</span>
+  </div>
+
+  <script>
+    (function() {
+      // DOM elements
+      const ticketList = document.getElementById('ticketList');
+      const fromInput = document.getElementById('fromInput');
+      const toInput = document.getElementById('toInput');
+      const searchBtn = document.getElementById('searchBtn');
+      const selectedContainer = document.getElementById('selectedTicketContainer');
+      const placeholderMsg = document.getElementById('placeholderMsg');
+      const filledTicket = document.getElementById('filledTicket');
+      const baseFareSpan = document.getElementById('baseFare');
+      const taxesSpan = document.getElementById('taxes');
+      const totalPriceSpan = document.getElementById('totalPrice');
+      const confirmBtn = document.getElementById('confirmBtn');
+      const toast = document.getElementById('toast');
+      const toastText = document.getElementById('toastText');
+      const dateInput = document.getElementById('dateInput');
+      const timeSelect = document.getElementById('timeSelect');
+
+      // State
+      let selectedTicket = null; // { route, price, time, duration }
+      let allTickets = []; // array of ticket objects
+
+      // --- Helper: show toast
+      function showToast(message, isSuccess = true) {
+        toastText.textContent = message;
+        toast.style.background = isSuccess ? '#00c9a7' : '#ff6b6b';
+        toast.style.color = isSuccess ? '#0b1a2e' : 'white';
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 2800);
+      }
+
+      // --- Update summary UI based on selectedTicket
+      function updateSummary() {
+        if (selectedTicket) {
+          // Show filled area
+          placeholderMsg.style.display = 'none';
+          filledTicket.style.display = 'block';
+          
+          // Build filled content
+          filledTicket.innerHTML = `
+            <div class="selected-route">
+              <span><i class="fas fa-arrow-right"></i> ${selectedTicket.route}</span>
+            </div>
+            <div class="selected-details">
+              <span><i class="far fa-clock"></i> ${selectedTicket.time}</span>
+              <span><i class="fas fa-hourglass-half"></i> ${selectedTicket.duration}</span>
+            </div>
+            <div class="selected-price">$${selectedTicket.price}</div>
+          `;
+
+          // Calculate totals
+          const base = parseFloat(selectedTicket.price);
+          const tax = +(base * 0.12).toFixed(2); // 12% tax
+          const total = (base + tax).toFixed(2);
+
+          baseFareSpan.textContent = `$${base.toFixed(2)}`;
+          taxesSpan.textContent = `$${tax.toFixed(2)}`;
+          totalPriceSpan.textContent = `$${total}`;
+
+          confirmBtn.disabled = false;
+        } else {
+          // Show placeholder
+          placeholderMsg.style.display = 'flex';
+          filledTicket.style.display = 'none';
+          baseFareSpan.textContent = '$0.00';
+          taxesSpan.textContent = '$0.00';
+          totalPriceSpan.textContent = '$0.00';
+          confirmBtn.disabled = true;
+        }
+      }
+
+      // --- Clear selection highlight
+      function clearSelectionHighlight() {
+        document.querySelectorAll('.ticket-item').forEach(item => {
+          item.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+          item.style.background = 'rgba(255, 255, 255, 0.04)';
+        });
+      }
+
+      // --- Select a ticket (from DOM element)
+      function selectTicketFromElement(element) {
+        const route = element.dataset.route;
+        const price = parseFloat(element.dataset.price);
+        const time = element.dataset.time;
+        const duration = element.dataset.duration;
+
+        selectedTicket = { route, price, time, duration };
+        
+        // Visual highlight
+        clearSelectionHighlight();
+        element.style.borderColor = '#6ee7ff';
+        element.style.background = 'rgba(110, 231, 255, 0.15)';
+
+        updateSummary();
+      }
+
+      // --- Build ticket list from array of ticket data
+      function renderTicketList(tickets) {
+        if (!tickets.length) {
+          ticketList.innerHTML = `<div style="color: #9ab8da; text-align: center; padding: 2rem 0;">No tickets found. Try different search.</div>`;
+          return;
+        }
+
+        ticketList.innerHTML = tickets.map((t, index) => `
+          <div class="ticket-item" data-route="${t.route}" data-price="${t.price}" data-time="${t.time}" data-duration="${t.duration}" style="animation-delay: ${index * 0.05}s">
+            <div class="ticket-info">
+              <div class="ticket-route">
+                <i class="fas fa-arrow-right"></i> ${t.route}
+              </div>
+              <div class="ticket-meta">
+                <span><i class="far fa-clock"></i> ${t.time}</span>
+                <span><i class="fas fa-hourglass-half"></i> ${t.duration}</span>
+              </div>
+            </div>
+            <div class="ticket-price">$${t.price}</div>
+          </div>
+        `).join('');
+
+        // Attach click listeners to each ticket
+        document.querySelectorAll('.ticket-item').forEach(item => {
+          item.addEventListener('click', () => {
+            selectTicketFromElement(item);
+          });
+        });
+
+        // If there was a selected ticket and it's still in the list, keep highlight
+        if (selectedTicket) {
+          const matchingItem = Array.from(document.querySelectorAll('.ticket-item')).find(
+            el => el.dataset.route === selectedTicket.route && 
+                  parseFloat(el.dataset.price) === selectedTicket.price &&
+                  el.dataset.time === selectedTicket.time
+          );
+          if (matchingItem) {
+            matchingItem.style.borderColor = '#6ee7ff';
+            matchingItem.style.background = 'rgba(110, 231, 255, 0.15)';
+          } else {
+            // selected ticket no longer in list -> clear selection
+            selectedTicket = null;
+            updateSummary();
+            clearSelectionHighlight();
+          }
+        }
+      }
+
+      // --- Generate mock tickets based on search inputs
+      function generateTickets(from, to, date, timePref) {
+        const fromCity = from.trim() || 'New York';
+        const toCity = to.trim() || 'Chicago';
+        const route = `${fromCity} → ${toCity}`;
+
+        // Base prices and times (with some variety)
+        const basePrices = [65, 89, 72, 105, 58, 94];
+        const times = ['06:45', '09:15', '12:30', '14:30', '17:20', '19:40', '21:15'];
+        const durations = ['2h 50m', '3h 20m', '3h 45m', '3h 10m', '2h 55m', '3h 30m'];
+
+        // Time preference filter
+        let timeFilter = null;
+        if (timePref.includes('Morning')) timeFilter = (t) => { const h = parseInt(t.split(':')[0]); return h >= 6 && h < 12; };
+        else if (timePref.includes('Afternoon')) timeFilter = (t) => { const h = parseInt(t.split(':')[0]); return h >= 12 && h < 18; };
+        else if (timePref.includes('Evening')) timeFilter = (t) => { const h = parseInt(t.split(':')[0]); return h >= 18; };
+
+        const tickets = [];
+        const count = 4 + Math.floor(Math.random() * 2); // 4-5 tickets
+        for (let i = 0; i < count; i++) {
+          const price = basePrices[Math.floor(Math.random() * basePrices.length)];
+          const time = times[Math.floor(Math.random() * times.length)];
+          const duration = durations[Math.floor(Math.random() * durations.length)];
+          
+          // Apply time filter if set, but always keep at least one
+          if (timeFilter && !timeFilter(time) && tickets.length > 0) continue;
+          
+          tickets.push({
+            route: route,
+            price: price,
+            time: time,
+            duration: duration,
+          });
+        }
+        // Ensure at least 3 tickets
+        while (tickets.length < 3) {
+          tickets.push({
+            route: route,
+            price: basePrices[Math.floor(Math.random() * basePrices.length)],
+            time: times[Math.floor(Math.random() * times.length)],
+            duration: durations[Math.floor(Math.random() * durations.length)],
+          });
+        }
+
+        // Sort by time
+        tickets.sort((a, b) => a.time.localeCompare(b.time));
+        return tickets;
+      }
+
+      // --- Initial load
+      function init() {
+        // Default ticket data (matching static HTML) - but we'll re-render from data
+        const defaultTickets = [
+          { route: 'New York → Chicago', price: 89, time: '14:30', duration: '3h 20m' },
+          { route: 'New York → Chicago', price: 72, time: '09:15', duration: '3h 45m' },
+          { route: 'New York → Chicago', price: 105, time: '19:40', duration: '3h 10m' },
+        ];
+        allTickets = defaultTickets;
+        renderTicketList(allTickets);
+        
+        // Clear any selection
+        selectedTicket = null;
+        updateSummary();
+        clearSelectionHighlight();
+      }
+
+      // --- Search handler
+      function handleSearch() {
+        const from = fromInput.value.trim() || 'New York';
+        const to = toInput.value.trim() || 'Chicago';
+        const date = dateInput.value;
+        const timePref = timeSelect.value;
+
+        // Generate mock tickets
+        const newTickets = generateTickets(from, to, date, timePref);
+        allTickets = newTickets;
+        renderTicketList(newTickets);
+
+        // Clear selected ticket if the route doesn't match the new route
+        // but we'll keep it if it's exactly the same route and still exists (unlikely)
+        // For simplicity, clear selection whenever search is performed
+        selectedTicket = null;
+        updateSummary();
+        clearSelectionHighlight();
+
+        showToast(`Found ${newTickets.length} tickets for ${from} → ${to}`, true);
+      }
+
+      // --- Confirm booking
+      function handleConfirm() {
+        if (!selectedTicket) return;
+        showToast(`✅ Booking confirmed: ${selectedTicket.route} at ${selectedTicket.time}`, true);
+        // Optionally reset selection after booking
+        // But we'll keep it for demo (could clear)
+        // selectedTicket = null;
+        // updateSummary();
+        // clearSelectionHighlight();
+      }
+
+      // --- Event listeners
+      searchBtn.addEventListener('click', handleSearch);
+
+      // Also trigger search on Enter in inputs
+      [fromInput, toInput].forEach(input => {
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') handleSearch();
+        });
+      });
+
+      // Confirm button
+      confirmBtn.addEventListener('click', handleConfirm);
+
+      // Click on ticket items (delegation, but we already attach in render)
+      // But since we re-render, we attach in renderTicketList.
+
+      // Initialize
+      init();
+
+      // Minor: make any static ticket clickable (already via init)
+    })();
+  </script>
+</body>
+</html>
